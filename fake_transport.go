@@ -35,10 +35,15 @@ type fkNet struct {
 }
 
 func (fk *fkNet) NewHost(ctx context.Context) (host.Host, error) {
-	priv, _, _ := ic.GenerateEd25519Key(fk.rnd)
+	priv, pubkey, _ := ic.GenerateEd25519Key(fk.rnd)
+	peerid, err := peer.IDFromPublicKey(pubkey)
+	if err != nil {
+		return nil, err
+	}
+	listenAddr := dummyIP6MA(peerid)
 	return libp2p.New(ctx, libp2p.Transport(fk.newTransport),
 		libp2p.Identity(priv),
-		libp2p.ListenAddrs(manet.IP6Unspecified),
+		libp2p.ListenAddrs(listenAddr),
 	)
 }
 
