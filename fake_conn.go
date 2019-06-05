@@ -13,7 +13,7 @@ import (
 )
 
 type fkConn struct {
-	net       *fkNet
+	net       *FkNet
 	transport *fkTransport
 
 	remotePubKey    ic.PubKey

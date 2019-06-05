@@ -18,14 +18,14 @@ import (
 	manet "github.com/multiformats/go-multiaddr-net"
 )
 
-func NewFakeNetwork(rnd io.Reader) *fkNet {
-	return &fkNet{
+func NewFakeNetwork(rnd io.Reader) *FkNet {
+	return &FkNet{
 		transports: make(map[peer.ID]*fkTransport),
 		rnd:        rnd,
 	}
 }
 
-type fkNet struct {
+type FkNet struct {
 	sync.RWMutex
 
 	rnd io.Reader
@@ -34,7 +34,7 @@ type fkNet struct {
 	ids        []peer.ID
 }
 
-func (fk *fkNet) NewHost(ctx context.Context) (host.Host, error) {
+func (fk *FkNet) NewHost(ctx context.Context) (host.Host, error) {
 	priv, pubkey, _ := ic.GenerateEd25519Key(fk.rnd)
 	peerid, err := peer.IDFromPublicKey(pubkey)
 	if err != nil {
@@ -56,7 +56,7 @@ func dummyIP6MA(peerid peer.ID) ma.Multiaddr {
 	return multiaddr
 }
 
-func (fk *fkNet) newTransport(priv ic.PrivKey) (*fkTransport, error) {
+func (fk *FkNet) newTransport(priv ic.PrivKey) (*fkTransport, error) {
 	peerid, err := peer.IDFromPrivateKey(priv)
 	if err != nil {
 		return nil, err
@@ -78,7 +78,7 @@ func (fk *fkNet) newTransport(priv ic.PrivKey) (*fkTransport, error) {
 	return trans, nil
 }
 
-func (fk *fkNet) Peers() []peer.ID {
+func (fk *FkNet) Peers() []peer.ID {
 	fk.RLock()
 	defer fk.RUnlock()
 	res := make([]peer.ID, len(fk.ids))
@@ -86,7 +86,7 @@ func (fk *fkNet) Peers() []peer.ID {
 	return res
 }
 
-func (fk *fkNet) dial(local peer.ID, remote peer.ID) (transport.CapableConn, error) {
+func (fk *FkNet) dial(local peer.ID, remote peer.ID) (transport.CapableConn, error) {
 	fk.RLock()
 	localTransport := fk.transports[local]
 	remoteTransport := fk.transports[remote]
@@ -118,7 +118,7 @@ func (fk *fkNet) dial(local peer.ID, remote peer.ID) (transport.CapableConn, err
 }
 
 type fkTransport struct {
-	net    *fkNet
+	net    *FkNet
 	closed bool
 
 	privKey   ic.PrivKey
