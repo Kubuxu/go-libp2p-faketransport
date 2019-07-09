@@ -56,7 +56,8 @@ func dummyIP6MA(peerid peer.ID) ma.Multiaddr {
 	return multiaddr
 }
 
-func (fk *FkNet) newTransport(priv ic.PrivKey) (*fkTransport, error) {
+// Use it with combinations of `libp2p.Transport` option
+func (fk *FkNet) NewTransport(priv ic.PrivKey) (*fkTransport, error) {
 	peerid, err := peer.IDFromPrivateKey(priv)
 	if err != nil {
 		return nil, err
